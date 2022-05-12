@@ -1,19 +1,31 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom'
-import { useSubscription } from '@apollo/client'
-import { QUESTION_DETAIL_SUBSCRIPTION } from './queries';
+import { useSubscription, useMutation } from '@apollo/client'
+import { QUESTION_DETAIL_SUBSCRIPTION, NEW_VOTE_MUTATION } from './queries';
 import Loading from '../../components/Loading';
 import Error from '../../components/Error';
 
 function Detail() {
     const { id } = useParams();
-    const [selected, setSelected] = useState();
+    const [selectedOptionId, setSelectedOptionId] = useState();
 
     const { loading, error, data } = useSubscription(QUESTION_DETAIL_SUBSCRIPTION, {
         variables: {
             id
         }
     });
+
+    const [newVote, { loading: loadingVote }] = useMutation(NEW_VOTE_MUTATION);
+
+    const handleClickVote = () => {
+        newVote({
+            variables: {
+                input: {
+                    option_id: selectedOptionId,
+                },
+            },
+        });
+    };
 
     if(loading) {
         return <Loading />
@@ -35,12 +47,13 @@ function Detail() {
                             type="radio" 
                             name="selected" 
                             value={option.id} 
-                            onChange={({ target }) => setSelected(target.value)}
+                            onChange={({ target }) => setSelectedOptionId(target.value)}
                         />
                         <span>{option.title}</span>
                     </label>
                 ))
             }
+            <button disabled={loadingVote} onClick={handleClickVote}>Vote</button>
       </div>
   )
 }
