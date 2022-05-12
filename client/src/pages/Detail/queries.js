@@ -17,3 +17,13 @@ export const QUESTION_DETAIL_SUBSCRIPTION = gql`
     }
     }
 `;
+
+export const NEW_VOTE_MUTATION = gql`
+    mutation newVote($input: votes_insert_input!) {
+    insert_votes_one(object: $input) {
+        option {
+        title
+        }
+    }
+    }
+`;
